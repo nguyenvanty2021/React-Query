@@ -7,8 +7,10 @@ import {
   useSuperMan,
   useSuperWoman,
 } from "../hooks/useSuperHeroes";
+import React, { useState } from "react";
 
 export const RQSuperHeroesPage = () => {
+  const [pageTemp, setPageTemp] = useState(0);
   // pagination linh động hơn
   const {
     hasNextPage,
@@ -16,15 +18,15 @@ export const RQSuperHeroesPage = () => {
     isFetching: isFetchingPagination,
     isFetchingNextPage,
   } = useSuperHeroesPaginationV2("1");
-  const onSuccess = (data) => {
-    console.log("onsuccess: ", data);
-  };
-  const onError = (error) => {
-    console.log("onerror: ", error);
-  };
+  // const onSuccess = (data) => {
+  //   console.log("onsuccess: ", data);
+  // };
+  // const onError = (error) => {
+  //   console.log("onerror: ", error);
+  // };
   // GET
   const { isLoading, data, isError, error, isFetching, refetch } =
-    useSuperHeroes(onSuccess, onError);
+    useSuperHeroes(pageTemp, pageTemp + 1);
   const {
     isLoading: isLoadingV3,
     data: dataV3,
@@ -74,26 +76,27 @@ export const RQSuperHeroesPage = () => {
       </h2>
     );
   }
-  console.log(dataV3);
+  console.log(data);
   // lần đầu cả isLoading và isFetching đều = true
   // ở những lần sau isLoading luôn = false và isFetching có thể = true và = false khi data trên server của api này có sự thay đổi
   // hoặc khi click qua tab khác rồi click lại tab này mà tab này hiện đang ở menu call api = react-query -> chi tiết đã giải thích ở trên
   console.log({ isLoading, isFetching });
-  console.log(dataV3);
   const listTotal = dataV3?.pages?.reduce((acc, page) => {
     return [...acc, ...page?.data?.users];
   }, []);
-  console.log(listTotal);
   return (
     <>
       <h2>Super Heroes Page</h2>
       {isSuccess ? <div>Todo added!</div> : null}
       <h1>GET</h1>
       <h1>Data List 1</h1>
-      {data?.data.map((hero, index) => {
-        return <div key={index}>{hero.title}</div>;
+      {data?.data?.users.map((hero, index) => {
+        return <div key={index}>{hero.email}</div>;
       })}
       <button onClick={refetch}>Fetch API</button>
+      <button onClick={() => setPageTemp(pageTemp + 1)}>
+        Page Next (Now {pageTemp})
+      </button>
       <button onClick={handleAdd}>Add Data</button>
       <h1>GET BY ID</h1>
       <div>{dataById?.data?.title}</div>
