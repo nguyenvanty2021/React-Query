@@ -1,34 +1,23 @@
-import { useQuery, useInfiniteQuery, useMutation,useQueryClient } from "react-query";
+import {
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "react-query";
 import axios from "axios";
 import { request } from "../utils/axios-utils";
+// GET
 const fetchSuperHeroes = () => {
-  //return axios.get("https://61d3e3feb4c10c001712bb0a.mockapi.io/orders");
-  return request({url: '/orders'})
+  // await axios.post(`/api/posts/${id}`)
+  // return axios.get("https://61d3e3feb4c10c001712bb0a.mockapi.io/orders");
+  return request({ url: "/task" });
 };
-const fetchSuperMan = () => {
-   // return axios.get("https://61d3e3feb4c10c001712bb0a.mockapi.io/orders");
-    return request({url: '/orders'})
-  };
-  const fetchSuperWoman = () => {
-   // return axios.get("https://61d3e3feb4c10c001712bb0a.mockapi.io/orders");
-    return request({url: '/orders'})
-  };
-const fetchSuperHeroesByID = (id) => {
-    return axios.get(`https://61d3e3feb4c10c001712bb0a.mockapi.io/orders/${id}`);
-}
-const fetchSuperHeroesPagination = (page) => {
-  return axios.get(`https://61d3e3feb4c10c001712bb0a.mockapi.io/orders?_limit=28_page=${page}}`);
-}
-const fetchSuperHeroesPaginationV2 = ({pageParam = 1}) => {
-  return axios.get(`https://61d3e3feb4c10c001712bb0a.mockapi.io/orders?_limit=28_page=${pageParam}}`);
-}
-const addSuperHeroes = (hero) => {
-  //return axios.post('https://61d3e3feb4c10c001712bb0a.mockapi.io/orders', hero)
-  return request({url: '/orders', method: 'post', data: hero})
-}
-// getAll
+// GET
 export const useSuperHeroes = (onSuccess, onError) => {
   return useQuery("super-heroes", fetchSuperHeroes, {
+    // cacheTime: Infinity,
+    // refetchOnWindowFocus: false,
+    // staleTime: Infinity,
     //cacheTime: 5000, // nếu dùng thuộc tính này thì sau 5s nó sẽ clear cache đi, nghĩa là lúc này khi click qua menu khác chờ 5s rồi click qua menu chứa call api = react-query thì nó sẽ call lại api mới và xuất loading ra -> mặc định thì nó sẽ luôn lưu lại cache và không clear đi -> cũng không nên dùng thuộc tính cacheTime này làm gì cả
     //staleTime: 30000, // nếu dùng thuộc tính này thì sau 30000 = 30s mới cho phép fetch lại data khi có data mới trên server hoặc khi user click qua menu khác click lại menu có call api = react-query thì mới fetch -> dưới 30s thì data luôn là data ở lần fetch đầu tiên và luôn như vậy -> cũng không nên dùng thuộc tính staleTime này làm gì cả
     // vì lý do ở dòng 17 nên luôn để mặc định staleTime là 0 -> mặc dù default = 0 rồi nhưng vẫn cứ để, để sau có cần thay đổi gì thì dùng
@@ -46,30 +35,64 @@ export const useSuperHeroes = (onSuccess, onError) => {
     // }
   });
 };
-export const useSuperMan = () => {
-    return useQuery("super-man", fetchSuperMan, {
-      staleTime: 0,
-    });
+// GET BY ID
+const fetchSuperHeroesByID = (id) => {
+  return axios.get(`https://61879efe057b9b00177f9a22.mockapi.io/task/${id}`);
 };
-export const useSuperWoman = () => {
-    return useQuery("super-woman", fetchSuperWoman, {
-      staleTime: 0,
-    });
-};
-// getAllByID
+// GET BY ID
 export const useSuperHeroesByID = (id) => {
-    return useQuery(['super-hero', id], () => fetchSuperHeroesByID(id))
-}
-// getAllPagination
+  return useQuery(["super-hero", id], () => fetchSuperHeroesByID(id));
+};
+// GET PAGINATION
 export const useSuperHeroesPagination = (page) => {
-  return useQuery(['super-hero', page], () => fetchSuperHeroesPagination(page), {
-    keepPreviousData: true, // trong lúc chờ pagination sang trang 2 thì UI vẫn hiện data của trang 1 chứ không hiện loading như thông thường
-  })
-}
+  return useQuery(
+    ["super-hero", page],
+    () => fetchSuperHeroesPagination(page),
+    {
+      keepPreviousData: true, // trong lúc chờ pagination sang trang 2 thì UI vẫn hiện data của trang 1 chứ không hiện loading như thông thường
+    }
+  );
+};
+const fetchSuperHeroesPagination = (page) => {
+  return axios.get(
+    `https://61d3e3feb4c10c001712bb0a.mockapi.io/orders?_limit=28_page=${page}}`
+  );
+};
+// GET
+const fetchSuperHeroesV33 = ({ pageParam = 0 }) => {
+  return axios.get(
+    `https://api.slingacademy.com/v1/sample-data/users?offset=${pageParam}&limit=5`
+  );
+};
+// GET
+export const useSuperHeroesV3 = () => {
+  return useQuery("super-hero-v3", () => fetchSuperHeroesV33());
+};
+// getAllPagination linh động hơn
+export const useSuperHeroesPaginationV2 = () => {
+  return useInfiniteQuery({
+    queryKey: "super-hero-v3",
+    queryFn: fetchSuperHeroesV33,
+    getNextPageParam: (lastPage) => {
+      console.log(lastPage);
+      if (lastPage?.data?.users?.length < lastPage?.data?.total_users) {
+        return lastPage?.data?.offset + 1;
+      }
+      return undefined;
+    },
+    // trong đây mình sẽ xử lý các trường hợp click page: VD: +1, +10+ page cuối, page đầu
+  });
+};
+// POST
+const addSuperHeroes = (hero) => {
+  //return axios.post('https://61d3e3feb4c10c001712bb0a.mockapi.io/orders', hero)
+  return request({ url: "/task", method: "post", data: hero });
+};
 // POST DATA
 export const useAddSuperHeroesData = () => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   return useMutation(addSuperHeroes, {
+    // retry: 3, // useMutation cũng có có retry luôn
     onSuccess: (data) => {
       // khi add thành công nó tự call lại api getAll dựa vào key 'super-heroes' để quyết định call lại api getAll nào
       // cách 1:
@@ -82,40 +105,30 @@ export const useAddSuperHeroesData = () => {
       //   }
       // })
     },
-    // cách 3
+    // cách 3 dùng cách này có thể refactor data
     onMutate: async (obj) => {
-      await queryClient.cancelQueries('super-heroes');
-      const previousHeroData = queryClient.getQueriesData('super-heroes')
-      queryClient.setQueriesData('super-heroes', (oldQueryData) => {
+      await queryClient.cancelQueries("super-heroes");
+      const previousHeroData = queryClient.getQueriesData("super-heroes");
+      console.log(previousHeroData);
+      queryClient.setQueriesData("super-heroes", (oldQueryData) => {
+        console.log(oldQueryData);
+        console.log(obj);
+        obj.status = true;
+        oldQueryData.data = oldQueryData.data.push(obj);
         return {
           ...oldQueryData,
-          data: [
-            ...oldQueryData.data,
-          ],
-        }
-      })
+        };
+      });
       return {
-        previousHeroData
-      }
+        previousHeroData,
+      };
     },
     onError: (_error, _hero, context) => {
-      queryClient.setQueriesData('super-heroes', context.previousHeroData)
+      queryClient.setQueriesData("super-heroes", context.previousHeroData);
     },
     onSettled: () => {
-      queryClient.invalidateQueries('super-heroes')
+      // chắc chắn vào đây
+      return queryClient.invalidateQueries("super-heroes");
     },
-  })
-}
-// getAllPagination linh động hơn
-export const useSuperHeroesPaginationV2 = () => {
-  return useInfiniteQuery(['super-hero'],fetchSuperHeroesPaginationV2,{
-    // trong đây mình sẽ xử lý các trường hợp click page: VD: +1, +10+ page cuối, page đầu
-    getNextPageParam: (_lastPage, pages) => {
-      if(pages.length < 4) {
-        return pages.length + 1
-      } else {
-        return undefined;
-      }
-    },
-  })
-}
+  });
+};
