@@ -85,6 +85,8 @@ export const useSuperHeroes = (pageCurrent, nextPage) => {
       //   const arrayRefactor = data && data?.data.length > 0 && data?.data.map((values) => values?.CustomerName === 'CustomerName 1')
       //   return arrayRefactor;
       // }
+      retry: 5, // call lai api 5 lần sau lần lỗi đầu tiên,
+      retryDelay: 1000, // mỗi lần call lại cách nhau 1s
       keepPreviousData: true, // trong lúc chờ pagination sang trang 2 thì UI vẫn hiện data của trang 1 chứ không hiện loading như thông thường
     }
   );
