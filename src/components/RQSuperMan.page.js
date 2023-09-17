@@ -8,7 +8,7 @@ import {
   useSuperMan,
   useSuperWoman,
 } from "../hooks/useSuperHeroes";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export const RQSuperHeroesPage = () => {
   const [pageTemp, setPageTemp] = useState(0);
@@ -21,6 +21,16 @@ export const RQSuperHeroesPage = () => {
     isFetchingNextPage,
   } = useSuperHeroesPaginationV2("1");
   console.log(dataInit);
+  const debounce = (fn, delay) => {
+    let timer = null;
+    return function (...args) {
+      const context = this;
+      timer && clearTimeout(timer);
+      timer = setTimeout(() => {
+        fn.apply(context, args);
+      }, delay);
+    };
+  };
   // const onSuccess = (data) => {
   //   console.log("onsuccess: ", data);
   // };
@@ -30,6 +40,14 @@ export const RQSuperHeroesPage = () => {
   // GET
   const { isLoading, data, isError, error, isFetching, refetch } =
     useSuperHeroes(pageTemp, pageTemp + 1);
+  let count = 0;
+  // const handleRefetch = debounce(refetch, 500);
+  // useEffect(() => {
+  //   setInterval(() => {
+  //     count++;
+  //     if (count <= 10) refetch();
+  //   }, 500);
+  // }, []);
   const {
     isLoading: isLoadingTask,
     data: dataTask,
@@ -104,6 +122,7 @@ export const RQSuperHeroesPage = () => {
       <h2>Super Heroes Page</h2>
       {isSuccess ? <div>Todo added!</div> : null}
       <h1>GET</h1>
+      <button onClick={handleRefetch}>Fetch API</button>
       <h1>Data List 1</h1>
       {data?.data?.users.map((hero, index) => {
         return <div key={index}>{hero.email}</div>;
@@ -112,7 +131,7 @@ export const RQSuperHeroesPage = () => {
       {dataTask?.data?.map((hero, index) => {
         return <div key={index}>{hero.title}</div>;
       })}
-      <button onClick={refetch}>Fetch API</button>
+
       <button onClick={() => setPageTemp(pageTemp + 1)}>
         Page Next (Now {pageTemp})
       </button>
