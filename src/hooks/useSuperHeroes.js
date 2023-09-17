@@ -15,6 +15,41 @@ const fetchSuperHeroes = (page) => {
     `https://api.slingacademy.com/v1/sample-data/users?offset=${page}&limit=5`
   );
 };
+const fetchSuperHeroesTask = () => {
+  return axios.get("https://61879efe057b9b00177f9a22.mockapi.io/task");
+};
+// GET
+export const useSuperHeroesTask = () => {
+  // const queryClient = useQueryClient();
+  return useQuery("task", () => fetchSuperHeroesTask(), {
+    // cacheTime: Infinity,
+    // refetchOnWindowFocus: false,
+    // staleTime: Infinity,
+    //cacheTime: 5000, // nếu dùng thuộc tính này thì sau 5s nó sẽ clear cache đi, nghĩa là lúc này khi click qua menu khác chờ 5s rồi click qua menu chứa call api = react-query thì nó sẽ call lại api mới và xuất loading ra -> mặc định thì nó sẽ luôn lưu lại cache và không clear đi -> cũng không nên dùng thuộc tính cacheTime này làm gì cả
+    //staleTime: 30000, // nếu dùng thuộc tính này thì sau 30000 = 30s mới cho phép fetch lại data khi có data mới trên server hoặc khi user click qua menu khác click lại menu có call api = react-query thì mới fetch -> dưới 30s thì data luôn là data ở lần fetch đầu tiên và luôn như vậy -> cũng không nên dùng thuộc tính staleTime này làm gì cả
+    // vì lý do ở dòng 17 nên luôn để mặc định staleTime là 0 -> mặc dù default = 0 rồi nhưng vẫn cứ để, để sau có cần thay đổi gì thì dùng
+    // staleTime: 0,
+    staleTime: 20 * 1000, // = 20s
+    //refetchOnMount: true // = true fetch data với trường hợp như bình thường (chuyển menu, chuyển tab, khi có data mới), còn = false thì sẽ không fetch lại data luôn (dữ liệu luôn là dữ liệu cũ), = 'always' thì luôn fetch lại data (nếu luôn fetch lại data thì khác gì không dùng react-query đâu) -> mặc định là = true
+    //refetchOnWindowFocus: true // mặc định là = true, khi click sang tab google click lại tab product này thì call lại api, còn nếu = false thì không call lại api hay nói cách khác là không fetch lại data
+    //refetchInterval: 2000, // mặc định là = false, nhưng nếu mình thay vào số 2000 thì nghĩa là cứ mỗi 2s sẽ call lại hay fetch lại api 1 lần
+    //enabled: true // mặc định là = true, nếu để = false nó sẽ không call api luôn. Sau đó muốn có data phải kết hợp với function 'refetch' bỏ function này vào onClick để fetch ra data -> thường dùng cho trường hợp POST, PATCH, PUT, DELETE -> mà cũng không cần thiết nữa vì react-query nó tự fetch lại data khi có data mới rồi
+    // onSuccess,
+    // call trước data page tiếp theo
+    // onSuccess: () => {
+    //   queryClient.prefetchQuery(getQueryKey(nextPage), () =>
+    //     fetchSuperHeroes(nextPage)
+    //   );
+    // },
+    // onError,
+    // refactor data api trước khi lấy
+    // select: (data) => {
+    //   const arrayRefactor = data && data?.data.length > 0 && data?.data.map((values) => values?.CustomerName === 'CustomerName 1')
+    //   return arrayRefactor;
+    // }
+    keepPreviousData: true, // trong lúc chờ pagination sang trang 2 thì UI vẫn hiện data của trang 1 chứ không hiện loading như thông thường
+  });
+};
 // GET
 export const useSuperHeroes = (pageCurrent, nextPage) => {
   const queryClient = useQueryClient();
@@ -29,18 +64,21 @@ export const useSuperHeroes = (pageCurrent, nextPage) => {
       //cacheTime: 5000, // nếu dùng thuộc tính này thì sau 5s nó sẽ clear cache đi, nghĩa là lúc này khi click qua menu khác chờ 5s rồi click qua menu chứa call api = react-query thì nó sẽ call lại api mới và xuất loading ra -> mặc định thì nó sẽ luôn lưu lại cache và không clear đi -> cũng không nên dùng thuộc tính cacheTime này làm gì cả
       //staleTime: 30000, // nếu dùng thuộc tính này thì sau 30000 = 30s mới cho phép fetch lại data khi có data mới trên server hoặc khi user click qua menu khác click lại menu có call api = react-query thì mới fetch -> dưới 30s thì data luôn là data ở lần fetch đầu tiên và luôn như vậy -> cũng không nên dùng thuộc tính staleTime này làm gì cả
       // vì lý do ở dòng 17 nên luôn để mặc định staleTime là 0 -> mặc dù default = 0 rồi nhưng vẫn cứ để, để sau có cần thay đổi gì thì dùng
-      staleTime: 0,
+      // staleTime: 0,
+      staleTime: 60 * 1000, // = 60s
       //refetchOnMount: true // = true fetch data với trường hợp như bình thường (chuyển menu, chuyển tab, khi có data mới), còn = false thì sẽ không fetch lại data luôn (dữ liệu luôn là dữ liệu cũ), = 'always' thì luôn fetch lại data (nếu luôn fetch lại data thì khác gì không dùng react-query đâu) -> mặc định là = true
       //refetchOnWindowFocus: true // mặc định là = true, khi click sang tab google click lại tab product này thì call lại api, còn nếu = false thì không call lại api hay nói cách khác là không fetch lại data
       //refetchInterval: 2000, // mặc định là = false, nhưng nếu mình thay vào số 2000 thì nghĩa là cứ mỗi 2s sẽ call lại hay fetch lại api 1 lần
       //enabled: true // mặc định là = true, nếu để = false nó sẽ không call api luôn. Sau đó muốn có data phải kết hợp với function 'refetch' bỏ function này vào onClick để fetch ra data -> thường dùng cho trường hợp POST, PATCH, PUT, DELETE -> mà cũng không cần thiết nữa vì react-query nó tự fetch lại data khi có data mới rồi
       // onSuccess,
+
       // call trước data page tiếp theo
-      onSuccess: () => {
-        queryClient.prefetchQuery(getQueryKey(nextPage), () =>
-          fetchSuperHeroes(nextPage)
-        );
-      },
+      // onSuccess: () => {
+      //   queryClient.prefetchQuery(getQueryKey(nextPage), () =>
+      //     fetchSuperHeroes(nextPage)
+      //   );
+      // },
+
       // onError,
       // refactor data api trước khi lấy
       // select: (data) => {
@@ -123,10 +161,10 @@ export const useAddSuperHeroesData = () => {
     },
     // cách 3 dùng cách này có thể refactor data
     onMutate: async (obj) => {
-      await queryClient.cancelQueries("super-heroes");
-      const previousHeroData = queryClient.getQueriesData("super-heroes");
+      await queryClient.cancelQueries("task");
+      const previousHeroData = queryClient.getQueriesData("task");
       console.log(previousHeroData);
-      queryClient.setQueriesData("super-heroes", (oldQueryData) => {
+      queryClient.setQueriesData("task", (oldQueryData) => {
         console.log(oldQueryData);
         console.log(obj);
         obj.status = true;
@@ -140,11 +178,11 @@ export const useAddSuperHeroesData = () => {
       };
     },
     onError: (_error, _hero, context) => {
-      queryClient.setQueriesData("super-heroes", context.previousHeroData);
+      queryClient.setQueriesData("task", context.previousHeroData);
     },
     onSettled: () => {
       // chắc chắn vào đây
-      return queryClient.invalidateQueries("super-heroes");
+      return queryClient.invalidateQueries("task");
     },
   });
 };

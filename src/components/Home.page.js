@@ -9,10 +9,19 @@ export const HomePage = () => {
             <Link to="/">Home</Link>
           </li>
           <li>
-            <Link to="/super-heroes">Traditional Super Heroes</Link>
+            <Link to="/a">a</Link>
           </li>
           <li>
-            <Link to="/rq-super-heroes">RQ Super Heroes</Link>
+            <Link to="/b">b</Link>
+          </li>
+          <li>
+            <Link to="/c">c</Link>
+          </li>
+          <li>
+            <Link to="/d">d</Link>
+          </li>
+          <li>
+            <Link to="/e">e</Link>
           </li>
         </ul>
       </nav>
